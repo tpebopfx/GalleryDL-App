@@ -30,3 +30,4 @@ android.permissions = INTERNET, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE
 # Специальный режим для запуска веб-приложений (создает невидимый браузер внутри приложения)
 p4a.bootstrap = webview
 p4a.port = 5000
+
