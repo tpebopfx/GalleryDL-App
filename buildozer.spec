@@ -15,7 +15,7 @@ source.dir = .
 source.include_exts = py,png,jpg,html,css,js,sqlite3
 source.include_patterns = templates/*, static/css/*, static/js/*
 
-version = 1.0
+version = 1.1
 
 # Самое главное: библиотеки, которые зашьются внутрь APK
 requirements = python3, flask, gallery-dl
