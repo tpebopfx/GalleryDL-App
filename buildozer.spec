@@ -2,7 +2,10 @@
 # Название твоего приложения (будет под иконкой на телефоне)
 title = Gallery App
 package.name = galleryapp
-package.domain = com.твоеимя
+package.domain = com.tpebopfx
+
+# ИКОНКА ПРИЛОЖЕНИЯ (Добавляем сюда)
+icon.filename = icon.png
 
 # Указываем, откуда брать файлы
 source.dir = .
