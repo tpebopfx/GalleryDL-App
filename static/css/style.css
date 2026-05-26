@@ -1,0 +1,207 @@
+/* --- БАЗОВЫЕ НАСТРОЙКИ И ФОН --- */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #080C16;
+    color: #E2E8F0;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    margin: 0;
+    padding: 10px;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+h2 {
+    text-align: center;
+    color: #60A5FA;
+    margin-bottom: 20px;
+}
+
+/* --- ПАНЕЛИ (БЛОКИ) --- */
+.box {
+    background-color: #111827;
+    border: 1px solid #1E293B;
+    border-radius: 16px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #E2E8F0;
+    font-size: 14px;
+}
+
+/* --- ПОЛЯ ВВОДА --- */
+input[type="text"], select, textarea {
+    width: 100%;
+    background-color: #0B1120;
+    color: #F8FAFC;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 5px;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.hint-text {
+    display: block;
+    font-size: 12px;
+    color: #94A3B8;
+    margin-bottom: 10px;
+}
+
+/* --- АККОРДЕОН (НАСТРОЙКИ) --- */
+.accordion {
+    margin-bottom: 15px;
+}
+
+.accordion-btn {
+    width: 100%;
+    background-color: #111827;
+    color: #E2E8F0;
+    border: 1px solid #1E293B;
+    border-radius: 12px;
+    padding: 12px;
+    text-align: left;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.accordion-content {
+    display: none;
+    padding: 10px;
+    background: #0B1120;
+    border-radius: 0 0 12px 12px;
+    margin-top: -5px;
+    border: 1px solid #1E293B;
+    border-top: none;
+}
+
+.accordion-content.show {
+    display: block;
+}
+
+.accordion-content label {
+    font-weight: normal;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* --- КНОПКИ УПРАВЛЕНИЯ --- */
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+button {
+    flex: 1;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+}
+
+button.primary {
+    background: linear-gradient(135deg, #1D4ED8 0%, #3B82F6 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.25);
+}
+
+button.primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+button.stop {
+    background-color: #0F172A;
+    border: 1px solid #EF4444;
+    color: #F87171;
+}
+
+/* --- СТИЛИ ДЛЯ БЛОКА ИСТОРИИ --- */
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.history-header label {
+    margin-bottom: 0;
+}
+
+.icon-btn {
+    flex: none;
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: #60A5FA;
+    transition: transform 0.2s;
+    padding: 5px;
+    box-shadow: none;
+    width: auto;
+}
+
+.icon-btn:active {
+    transform: scale(0.85);
+}
+
+.history-list {
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.history-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.history-list::-webkit-scrollbar-thumb {
+    background-color: #1E293B;
+    border-radius: 4px;
+}
+
+.history-item {
+    background-color: #0B1120;
+    border: 1px solid #1E293B;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
+.history-item-top {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    color: #60A5FA;
+    margin-bottom: 4px;
+}
+
+.history-item-meta {
+    display: flex;
+    justify-content: space-between;
+    color: #94A3B8;
+    font-size: 11px;
+  }
+  
