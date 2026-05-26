@@ -4,7 +4,10 @@ title = Gallery App
 package.name = galleryapp
 package.domain = com.tpebopfx
 
-# ИКОНКА ПРИЛОЖЕНИЯ (Добавляем сюда)
+# АВТОМАТИЧЕСКОЕ ПРИНЯТИЕ ЛИЦЕНЗИИ GOOGLE (Решение ошибки)
+android.accept_sdk_license = True
+
+# ИКОНКА ПРИЛОЖЕНИЯ
 icon.filename = icon.png
 
 # Указываем, откуда брать файлы
