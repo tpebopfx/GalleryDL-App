@@ -1,16 +1,19 @@
 import os
-import subprocess
+import sys
 import atexit
 import sqlite3
+import threading
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify, Response
+
+# Импортируем саму библиотеку gallery-dl
+import gallery_dl
 
 app = Flask(__name__)
 
 # --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ---
-current_process = None
-stop_requested = False
 DB_NAME = "history.db" # Имя файла нашей базы данных
+stop_requested = False
 
 # --- БАЗА ДАННЫХ (Инициализация) ---
 def init_db():
@@ -29,6 +32,9 @@ def init_db():
     ''')
     conn.commit()
     conn.close()
+
+# Запускаем создание базы данных сразу при старте приложения
+init_db()
 
 # --- СПИСОК ПРИОРИТЕТНЫХ САЙТОВ ---
 PRIORITY_SITES = {
@@ -71,12 +77,9 @@ def get_sites():
 
 @app.route('/api/stop', methods=['POST'])
 def stop_download():
-    global current_process, stop_requested
+    global stop_requested
     stop_requested = True
-    if current_process:
-        current_process.terminate()
-        return jsonify({"status": "success", "message": "Остановка..."})
-    return jsonify({"status": "error", "message": "Нет активных загрузок."})
+    return jsonify({"status": "success", "message": "Остановка следующего файла..."})
 
 # Получение истории из базы данных
 @app.route('/api/history', methods=['GET'])
@@ -84,7 +87,6 @@ def get_history():
     try:
         conn = sqlite3.connect(DB_NAME)
         cursor = conn.cursor()
-        # Достаем последние 50 загрузок, сортируем от новых к старым
         cursor.execute("SELECT site, tags, files_added, size_bytes, timestamp FROM downloads ORDER BY id DESC LIMIT 50")
         rows = cursor.fetchall()
         conn.close()
@@ -105,7 +107,7 @@ def get_history():
 # Главный маршрут скачивания
 @app.route('/api/start_download', methods=['GET'])
 def start_download():
-    global current_process, stop_requested
+    global stop_requested
     stop_requested = False
     
     site = request.args.get('site')
@@ -113,7 +115,7 @@ def start_download():
     sort_folders = request.args.get('sort') == 'true'
     
     def generate():
-        global current_process, stop_requested
+        global stop_requested
         tags_list = [tag.strip() for tag in tags_input.split(",") if tag.strip()]
         
         if not tags_list:
@@ -137,22 +139,34 @@ def start_download():
             site_info = PRIORITY_SITES.get(site)
             url = site_info["url"].format(tag) if site_info and site != "Другой сайт" else tag
             
-            command = ["gallery-dl", "--directory", save_path, url]
             files_before, size_before = get_dir_stats(save_path)
             
             try:
-                current_process = subprocess.Popen(
-                    command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1
-                )
+                # Настраиваем gallery-dl через Python API
+                gallery_dl.config.set(("extractor",), "base-directory", save_path)
                 
-                for line in current_process.stdout:
+                # Запускаем скачивание в отдельном потоке, чтобы можно было прервать
+                job = gallery_dl.job.DownloadJob(url)
+                
+                # Функция для прерывания (костыль, так как встроенной остановки нет)
+                def run_job():
+                    try:
+                        job.run()
+                    except Exception as e:
+                        print(f"Job error: {e}")
+                
+                dl_thread = threading.Thread(target=run_job)
+                dl_thread.start()
+                
+                # Имитируем логи во время загрузки (и проверяем stop_requested)
+                while dl_thread.is_alive():
                     if stop_requested:
+                        # Так как поток убить нельзя, мы просто обрываем связь
+                        yield f"data: 🛑 Останавливаем загрузку текущего тега...\n\n"
                         break
-                    clean_line = line.strip()[-50:] 
-                    yield f"data: 📥 {clean_line}\n\n"
-                
-                current_process.wait()
-                
+                    yield f"data: 📥 Скачивание в процессе...\n\n"
+                    dl_thread.join(1.0) # Ждем 1 секунду
+
                 files_after, size_after = get_dir_stats(save_path)
                 diff_files = files_after - files_before
                 diff_size = size_after - size_before
@@ -189,12 +203,7 @@ def start_download():
         for line in summary_report.split('\n'):
             yield f"data: {line}\n\n"
             
-        current_process = None
         yield f"data: [DONE]\n\n"
 
     return Response(generate(), mimetype='text/event-stream')
-
-#if __name__ == '__main__':
-    # При запуске сервера проверяем и создаем базу данных
-#    init_db()
-#    app.run(debug=True, host='0.0.0.0', port=5000)
+    
