@@ -6,20 +6,20 @@ import threading
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify, Response
 
-# Импортируем саму библиотеку gallery-dl
-import gallery_dl
+# Правильный, точечный импорт нужных модулей gallery-dl
+import gallery_dl.config as gdl_config
+import gallery_dl.job as gdl_job
 
 app = Flask(__name__)
 
 # --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ---
-DB_NAME = "history.db" # Имя файла нашей базы данных
+DB_NAME = "history.db" 
 stop_requested = False
 
 # --- БАЗА ДАННЫХ (Инициализация) ---
 def init_db():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
-    # Создаем таблицу, если ее нет
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS downloads (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -33,7 +33,6 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Запускаем создание базы данных сразу при старте приложения
 init_db()
 
 # --- СПИСОК ПРИОРИТЕТНЫХ САЙТОВ ---
@@ -81,7 +80,6 @@ def stop_download():
     stop_requested = True
     return jsonify({"status": "success", "message": "Остановка следующего файла..."})
 
-# Получение истории из базы данных
 @app.route('/api/history', methods=['GET'])
 def get_history():
     try:
@@ -104,7 +102,6 @@ def get_history():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# Главный маршрут скачивания
 @app.route('/api/start_download', methods=['GET'])
 def start_download():
     global stop_requested
@@ -142,13 +139,13 @@ def start_download():
             files_before, size_before = get_dir_stats(save_path)
             
             try:
-                # Настраиваем gallery-dl через Python API
-                gallery_dl.config.set(("extractor",), "base-directory", save_path)
+                # Настраиваем gallery-dl через прямое обращение к модулям
+                gdl_config.load() # Инициализируем настройки
+                gdl_config.set(("extractor",), "base-directory", save_path)
                 
-                # Запускаем скачивание в отдельном потоке, чтобы можно было прервать
-                job = gallery_dl.job.DownloadJob(url)
+                # Создаем задачу скачивания
+                job = gdl_job.DownloadJob(url)
                 
-                # Функция для прерывания (костыль, так как встроенной остановки нет)
                 def run_job():
                     try:
                         job.run()
@@ -158,14 +155,12 @@ def start_download():
                 dl_thread = threading.Thread(target=run_job)
                 dl_thread.start()
                 
-                # Имитируем логи во время загрузки (и проверяем stop_requested)
                 while dl_thread.is_alive():
                     if stop_requested:
-                        # Так как поток убить нельзя, мы просто обрываем связь
                         yield f"data: 🛑 Останавливаем загрузку текущего тега...\n\n"
                         break
                     yield f"data: 📥 Скачивание в процессе...\n\n"
-                    dl_thread.join(1.0) # Ждем 1 секунду
+                    dl_thread.join(1.0)
 
                 files_after, size_after = get_dir_stats(save_path)
                 diff_files = files_after - files_before
@@ -178,7 +173,6 @@ def start_download():
                 else:
                     status = f"• ✅ {tag}: +{diff_files} шт. ({format_size(diff_size)})"
                     
-                    # --- СОХРАНЕНИЕ В БАЗУ ДАННЫХ ---
                     try:
                         conn = sqlite3.connect(DB_NAME)
                         cursor = conn.cursor()
