@@ -1,33 +1,29 @@
 [app]
-# Название твоего приложения (будет под иконкой на телефоне)
-title = Gallery App
-package.name = galleryapp
-package.domain = com.tpebopfx
-
-# АВТОМАТИЧЕСКОЕ ПРИНЯТИЕ ЛИЦЕНЗИИ GOOGLE (Решение ошибки)
-android.accept_sdk_license = True
-
-# ИКОНКА ПРИЛОЖЕНИЯ
-icon.filename = icon.png
-
-# Указываем, откуда брать файлы
+title = GalleryDL
+package.name = gallerydlapp
+package.domain = org.tpebopfx
 source.dir = .
-source.include_exts = py,png,jpg,html,css,js,sqlite3
-source.include_patterns = templates/*, static/css/*, static/js/*
+source.include_exts = py,png,jpg,kv,atlas,html,css,js,sqlite3
 
-version = 1.1
+# Версия приложения
+version = 1.2
 
-# Самое главное: библиотеки, которые зашьются внутрь APK
-requirements = python3, flask, gallery-dl
+# Требования (очень важно: добавлены kivy и android)
+requirements = python3, kivy, flask, gallery-dl, android
 
-# Настройки экрана (вертикальная ориентация)
-orientation = portrait
-fullscreen = 0
-
-# Разрешения для Android (Интернет и доступ к памяти)
+# Разрешения Android
 android.permissions = INTERNET, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE
 
-# Специальный режим для запуска веб-приложений (создает невидимый браузер внутри приложения)
-p4a.bootstrap = webview
-p4a.port = 5000
+# Настройки API (33 - современный стандарт)
+android.api = 33
+android.minapi = 24
 
+# Ориентация экрана
+orientation = portrait
+
+# Архитектуры (arm64 - для всех современных телефонов)
+android.archs = arm64-v8a
+
+[buildozer]
+log_level = 2
+warn_on_root = 1
