@@ -1,11 +1,6 @@
-name: Build Android APK
+name: Build APK
 
-on:
-  push:
-    branches:
-      - main
-      - master
-  workflow_dispatch:
+on: [workflow_dispatch] # ВОТ ЭТО ОТКЛЮЧАЕТ АВТОСБОРКУ
 
 jobs:
   build:
