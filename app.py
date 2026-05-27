@@ -139,11 +139,9 @@ def start_download():
             files_before, size_before = get_dir_stats(save_path)
             
             try:
-                # Настраиваем gallery-dl через прямое обращение к модулям
-                gdl_config.load() # Инициализируем настройки
+                # Устанавливаем директорию напрямую
                 gdl_config.set(("extractor",), "base-directory", save_path)
                 
-                # Создаем задачу скачивания
                 job = gdl_job.DownloadJob(url)
                 
                 def run_job():
@@ -200,4 +198,4 @@ def start_download():
         yield f"data: [DONE]\n\n"
 
     return Response(generate(), mimetype='text/event-stream')
-    
+        
