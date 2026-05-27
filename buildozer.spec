@@ -4,7 +4,7 @@ package.name = gallerydlapp
 package.domain = org.tpebopfx
 source.dir = .
 source.include_exts = py,png,jpg,html,css,js,sqlite3
-version = 1.1
+version = 1.2
 icon.filename = %(source.dir)s/icon.png
 
 # --- ВОТ ЭТО ВЕРНЕТ ТВОЙ ИНТЕРФЕЙС ---
