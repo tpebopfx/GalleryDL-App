@@ -1,42 +1,26 @@
+import os
 import threading
 import app
-from kivy.app import App
-from kivy.clock import Clock
-from kivy.uix.boxlayout import BoxLayout
 
-# Функция для запуска Flask в фоновом потоке
-def start_flask():
-    app.app.run(host='127.0.0.1', port=5000)
-
-class GalleryDLApp(App):
-    def build(self):
-        # Как только интерфейс построился, запрашиваем разрешения
-        Clock.schedule_once(self.request_android_permissions, 0)
+def request_android_permissions():
+    """Запрос разрешений напрямую через Android Java API без использования Kivy"""
+    try:
+        from jnius import autoclass
+        from android.permissions import request_permissions, Permission
         
-        # Запускаем Flask-сервер в фоне
-        flask_thread = threading.Thread(target=start_flask)
-        flask_thread.daemon = True
-        flask_thread.start()
-        
-        # Создаем пустой контейнер, чтобы Android не закрывал приложение из-за отсутствия окон
-        layout = BoxLayout()
-        return layout
-
-    def request_android_permissions(self, dt):
-        try:
-            from android.permissions import request_permissions, Permission
-            
-            def permission_callback(permissions, results):
-                print("Разрешения получены:", results)
-                
-            request_permissions([
-                Permission.INTERNET, 
-                Permission.WRITE_EXTERNAL_STORAGE, 
-                Permission.READ_EXTERNAL_STORAGE
-            ], permission_callback)
-        except ImportError:
-            print("Запуск не на Android, пропускаем запрос.")
+        # Запрашиваем стандартные права Android
+        request_permissions([
+            Permission.INTERNET,
+            Permission.WRITE_EXTERNAL_STORAGE,
+            Permission.READ_EXTERNAL_STORAGE
+        ])
+    except Exception as e:
+        print("Запуск не на Android или ошибка прав:", e)
 
 if __name__ == '__main__':
-    GalleryDLApp().run()
+    # Сначала запрашиваем разрешения через системный Java-интерфейс
+    request_android_permissions()
+    
+    # Запускаем Flask-сервер на локальном хосте
+    app.app.run(host='127.0.0.1', port=5000)
     
