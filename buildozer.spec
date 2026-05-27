@@ -1,55 +1,56 @@
 [app]
 
-# (str) Title of your application
+# --- ОСНОВНЫЕ НАСТРОЙКИ ПРИЛОЖЕНИЯ ---
 title = GalleryDL
-
-# (str) Package name
 package.name = gallerydlapp
-
-# (str) Package domain (needed for android packaging)
 package.domain = org.tpebopfx
-
-# (str) Source code where the main.py lives
 source.dir = .
-
-# (list) Source files to include (let empty to include all the files)
 source.include_exts = py,png,jpg,kv,atlas,html,css,js,sqlite3
-
-# (str) Application version
 version = 1.2
 
-# (list) Application requirements
-# Здесь мы добавили kivy и android для работы окон и разрешений
+# --- ЗАВИСИМОСТИ ---
+# Python 3, интерфейс Kivy, сервер Flask, движок скачивания и модуль для разрешений
 requirements = python3, kivy, flask, gallery-dl, android
 
-# (str) Supported orientations
+# --- НАСТРОЙКИ ЭКРАНА ---
 orientation = portrait
+fullscreen = 0
 
-# (list) Permissions
-# Раскомментировали и добавили права на чтение/запись
+# --- НАСТРОЙКИ ANDROID ---
+# Критически важно: раскомментированы и добавлены нужные права
 android.permissions = INTERNET, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE
 
-# (int) Target Android API, should be as high as possible.
+# Современные версии API (33 - стандарт для Android 13, 24 - минимум для Android 7.0)
 android.api = 33
-
-# (int) Minimum API your APK will support.
 android.minapi = 24
 
-# (list) The Android architectures to build for
-android.archs = arm64-v8a
+# Архитектуры: добавлены обе основные для максимальной совместимости со смартфонами
+android.archs = arm64-v8a, armeabi-v7a
 
-# (bool) Use --private data directory for prevents app to be readable by other apps
+# Разрешаем бэкап приложения в системе Android
+android.allow_backup = True
+
+# Изолированное хранилище (True - стандарт безопасности Android)
 android.private_storage = True
+
+# --- ПАРАМЕТРЫ ДЛЯ GITHUB ACTIONS (КРИТИЧНО) ---
+# Автоматическое принятие лицензий SDK, чтобы сборка не зависала с просьбой нажать "Y"
+android.accept_sdk_license = True
+
+# --- НАСТРОЙКИ ДЛЯ ДРУГИХ ПЛАТФОРМ (НЕ УДАЛЯТЬ) ---
+# Buildozer может упасть, если этих строк нет, даже если мы собираем под Android
+osx.python_version = 3
+osx.kivy_version = 1.9.1
 
 
 [buildozer]
 
-# (int) Log level (0 = error only, 1 = info, 2 = debug (with command output))
+# --- СИСТЕМНЫЕ НАСТРОЙКИ СБОРЩИКА ---
+# Уровень логирования (2 = детальный вывод в консоль, помогает при ошибках)
 log_level = 2
 
-# (int) Display warning if buildozer is run as root (0 = False, 1 = True)
+# Предупреждение при запуске от root (в GitHub Actions всегда 1 или 0)
 warn_on_root = 1
 
-# --- ВОТ ЭТИ СТРОКИ КРИТИЧЕСКИ ВАЖНЫ ДЛЯ GITHUB ACTIONS ---
-# Они говорят системе использовать стандартные пути окружения
+# Версия профиля конфигурации (GitHub Actions ищет этот параметр)
 default_config_version = 1
