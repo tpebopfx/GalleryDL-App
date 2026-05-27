@@ -2,23 +2,25 @@ import threading
 import app
 from kivy.app import App
 from kivy.clock import Clock
+from kivy.uix.boxlayout import BoxLayout
 
-# Функция для запуска Flask в отдельном фоновом потоке
+# Функция для запуска Flask в фоновом потоке
 def start_flask():
     app.app.run(host='127.0.0.1', port=5000)
 
 class GalleryDLApp(App):
     def build(self):
-        # Как только приложение построилось, запрашиваем разрешения
+        # Как только интерфейс построился, запрашиваем разрешения
         Clock.schedule_once(self.request_android_permissions, 0)
         
-        # Запускаем Flask-сервер в фоне, чтобы он не "вешал" Android
+        # Запускаем Flask-сервер в фоне
         flask_thread = threading.Thread(target=start_flask)
         flask_thread.daemon = True
         flask_thread.start()
         
-        # Kivy-окно оставляем пустым, так как у нас веб-интерфейс
-        return None 
+        # Создаем пустой контейнер, чтобы Android не закрывал приложение из-за отсутствия окон
+        layout = BoxLayout()
+        return layout
 
     def request_android_permissions(self, dt):
         try:
