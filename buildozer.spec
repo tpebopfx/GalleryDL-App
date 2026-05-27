@@ -1,6 +1,6 @@
 [app]
 
-# --- ОСНОВНЫЕ НАСТРОЙКИ ПРИЛОЖЕНИЯ ---
+# --- ОСНОВНЫЕ НАСТРОЙКИ ---
 title = GalleryDL
 package.name = gallerydlapp
 package.domain = org.tpebopfx
@@ -8,18 +8,20 @@ source.dir = .
 source.include_exts = py,png,jpg,kv,atlas,html,css,js,sqlite3
 version = 1.2
 
-# --- ИКОНКА ПРИЛОЖЕНИЯ ---
-# Если твоя иконка называется по-другому (например, logo.png), замени имя файла ниже:
+# --- ИКОНКА (убедись, что файл icon.png лежит в папке) ---
 icon.filename = %(source.dir)s/icon.png
 
-# --- ЗАВИСИМОСТИ ---
-requirements = python3, kivy, flask, gallery-dl, android
+# --- ВЕБ-ИНТЕРФЕЙС (ВОТ ЭТО ВЕРНЕТ ТВОЙ САЙТ ВМЕСТО ЧЕРНОГО ЭКРАНА) ---
+# Говорим сборщику, что наше приложение — это локальный веб-сайт
+p4a.html_app = True
 
-# --- НАСТРОЙКИ ЭКРАНА ---
-orientation = portrait
-fullscreen = 0
+# --- ЗАВИСИМОСТИ ---
+# Убрали Kivy, оставили только Flask, движок и системные модули Android
+requirements = python3, flask, gallery-dl, android, pyjnius
 
 # --- НАСТРОЙКИ ANDROID ---
+orientation = portrait
+fullscreen = 0
 android.permissions = INTERNET, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE
 android.api = 33
 android.minapi = 24
@@ -27,11 +29,6 @@ android.archs = arm64-v8a, armeabi-v7a
 android.allow_backup = True
 android.private_storage = True
 android.accept_sdk_license = True
-
-# --- НАСТРОЙКИ ДЛЯ ДРУГИХ ПЛАТФОРМ ---
-osx.python_version = 3
-osx.kivy_version = 1.9.1
-
 
 [buildozer]
 log_level = 2
