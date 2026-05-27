@@ -1,33 +1,30 @@
 [app]
-
-# --- ОСНОВНЫЕ НАСТРОЙКИ ---
 title = GalleryDL
 package.name = gallerydlapp
 package.domain = org.tpebopfx
 source.dir = .
-source.include_exts = py,png,jpg,kv,atlas,html,css,js,sqlite3
-version = 1.2
-
-# --- ИКОНКА (убедись, что файл icon.png лежит в папке) ---
+source.include_exts = py,png,jpg,html,css,js,sqlite3
+version = 1.1
 icon.filename = %(source.dir)s/icon.png
 
-# --- ВЕБ-ИНТЕРФЕЙС (ВОТ ЭТО ВЕРНЕТ ТВОЙ САЙТ ВМЕСТО ЧЕРНОГО ЭКРАНА) ---
-# Говорим сборщику, что наше приложение — это локальный веб-сайт
-p4a.html_app = True
+# --- ВОТ ЭТО ВЕРНЕТ ТВОЙ ИНТЕРФЕЙС ---
+p4a.bootstrap = webview
+p4a.port = 5000
 
-# --- ЗАВИСИМОСТИ ---
-# Убрали Kivy, оставили только Flask, движок и системные модули Android
-requirements = python3, flask, gallery-dl, android, pyjnius
+# Kivy нам больше не нужен, минус лишний вес
+requirements = python3, flask, gallery-dl, android
 
-# --- НАСТРОЙКИ ANDROID ---
 orientation = portrait
 fullscreen = 0
 android.permissions = INTERNET, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE
-android.api = 33
+
+# --- КРИТИЧНО ДЛЯ ПРАВ ДОСТУПА ---
+# Откатываем API до 29, чтобы обойти жесткие блокировки Android 11+
+android.api = 29
 android.minapi = 24
+
 android.archs = arm64-v8a, armeabi-v7a
 android.allow_backup = True
-android.private_storage = True
 android.accept_sdk_license = True
 
 [buildozer]
