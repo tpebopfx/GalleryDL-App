@@ -12,9 +12,9 @@ def ask_permissions():
         pass
 
 if __name__ == '__main__':
-    # Сразу просим права.
+    # Запрашиваем права
     ask_permissions()
     
-    # Webview требует, чтобы Flask работал строго с debug=False
+    # Запускаем Flask
     app.app.run(host='127.0.0.1', port=5000, debug=False)
     
