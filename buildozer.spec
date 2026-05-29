@@ -3,7 +3,7 @@ title = GalleryDL
 package.name = gallerydlapp
 package.domain = org.tpebopfx
 source.dir = .
-source.include_exts = py,png,jpg,html,css,js,sqlite3
+source.include_exts = py,png,jpg,html,css,js,sqlite3,json
 version = 1.2
 icon.filename = %(source.dir)s/icon.png
 
