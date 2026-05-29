@@ -14,7 +14,7 @@ icon.filename = %(source.dir)s/icon.png
 p4a.bootstrap = webview
 p4a.port = 5000
 
-requirements = python3, flask, gallery-dl, android, requests, urllib3
+requirements = python3, flask, gallery-dl, android, requests, urllib3, idna, certifi
 
 orientation = portrait
 fullscreen = 0
