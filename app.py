@@ -12,18 +12,22 @@ import gallery_dl.job as gdl_job
 app = Flask(__name__)
 
 # --- БАЗА ДАННЫХ И ПУТИ ---
+# Картинки качаем в общую папку загрузок телефона
 BASE_DIR = "/sdcard/Download/GalleryDL_App"
-DB_NAME = os.path.join(BASE_DIR, "history.db")
+
+# А базу данных прячем во внутреннюю приватную память приложения, куда Android ВСЕГДА разрешает писать
+if 'PYTHON_SERVICE_ARGUMENT' in os.environ or os.path.exists('/data/data'):
+    # Если мы на Android — пишем во внутреннее хранилище пакета приложения
+    DB_DIR = os.path.expanduser('~') 
+else:
+    # Если тестируем на ПК — пишем в текущую папку
+    DB_DIR = "."
+
+DB_NAME = os.path.join(DB_DIR, "history.db")
 stop_requested = False
 
 def get_db_connection():
-    """Безопасное подключение к БД. Создает папку и файл, только если они нужны."""
-    if not os.path.exists(BASE_DIR):
-        try:
-            os.makedirs(BASE_DIR)
-        except Exception as e:
-            print(f"Ошибка создания папки: {e}")
-            
+    """Безопасное подключение к БД во внутреннем хранилище."""
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute('''
