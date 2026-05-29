@@ -6,18 +6,24 @@ import threading
 from datetime import datetime
 from flask import Flask, render_template, request, jsonify, Response
 
-# Правильный, точечный импорт нужных модулей gallery-dl
 import gallery_dl.config as gdl_config
 import gallery_dl.job as gdl_job
 
 app = Flask(__name__)
 
-# --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ---
-DB_NAME = "history.db" 
+# --- БАЗА ДАННЫХ И ПУТИ ---
+BASE_DIR = "/sdcard/Download/GalleryDL_App"
+DB_NAME = os.path.join(BASE_DIR, "history.db")
 stop_requested = False
 
-# --- БАЗА ДАННЫХ (Инициализация) ---
-def init_db():
+def get_db_connection():
+    """Безопасное подключение к БД. Создает папку и файл, только если они нужны."""
+    if not os.path.exists(BASE_DIR):
+        try:
+            os.makedirs(BASE_DIR)
+        except Exception as e:
+            print(f"Ошибка создания папки: {e}")
+            
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute('''
@@ -31,9 +37,7 @@ def init_db():
         )
     ''')
     conn.commit()
-    conn.close()
-
-init_db()
+    return conn
 
 # --- СПИСОК ПРИОРИТЕТНЫХ САЙТОВ ---
 PRIORITY_SITES = {
@@ -83,7 +87,7 @@ def stop_download():
 @app.route('/api/history', methods=['GET'])
 def get_history():
     try:
-        conn = sqlite3.connect(DB_NAME)
+        conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT site, tags, files_added, size_bytes, timestamp FROM downloads ORDER BY id DESC LIMIT 50")
         rows = cursor.fetchall()
@@ -120,7 +124,6 @@ def start_download():
             yield f"data: [DONE]\n\n"
             return
 
-        base_dir = "/sdcard/Download/GalleryDL_App"
         total_files, total_size = 0, 0
         summary_report = "✨ ИТОГОВЫЙ ОТЧЕТ:\n"
 
@@ -131,7 +134,7 @@ def start_download():
                 break
             
             yield f"data: Подготовка: {tag}...\n\n"
-            save_path = os.path.join(base_dir, site, tag) if sort_folders else os.path.join(base_dir, site)
+            save_path = os.path.join(BASE_DIR, site, tag) if sort_folders else os.path.join(BASE_DIR, site)
             
             site_info = PRIORITY_SITES.get(site)
             url = site_info["url"].format(tag) if site_info and site != "Другой сайт" else tag
@@ -172,7 +175,7 @@ def start_download():
                     status = f"• ✅ {tag}: +{diff_files} шт. ({format_size(diff_size)})"
                     
                     try:
-                        conn = sqlite3.connect(DB_NAME)
+                        conn = get_db_connection()
                         cursor = conn.cursor()
                         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                         cursor.execute(
@@ -198,4 +201,4 @@ def start_download():
         yield f"data: [DONE]\n\n"
 
     return Response(generate(), mimetype='text/event-stream')
-        
+                        
